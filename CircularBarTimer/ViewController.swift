@@ -29,7 +29,7 @@ class ViewController: UIViewController {
     
     let timeLabel: UILabel = {
         let label = UILabel()
-        label.text = "1"
+        label.text = "10"
         label.font = UIFont.boldSystemFont(ofSize: 84)
         label.textColor = .black
         label.numberOfLines = 0
@@ -47,10 +47,74 @@ class ViewController: UIViewController {
         return button
     } ()
     
+    var timer = Timer()
+    
+    let shapeLayer = CAShapeLayer()
+    
+    var durationTimer = 10
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.animationCircular()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setConstraints()
+        startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc func startButtonTapped() {
+        
+        basicAnimation()
+        
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        
+    }
+    
+    @objc func timerAction() {
+        
+        durationTimer -= 1
+        timeLabel.text = "\(durationTimer)"
+        
+        if durationTimer == 0 {
+            timer.invalidate()
+            durationTimer = 10
+            timer.invalidate()
+        }
+    }
+    
+    //MARK: Animation
+    
+    func animationCircular() {
+        
+        let center = CGPoint(x: shapeView.frame.width / 2, y: shapeView.frame.height / 2)
+        
+        let endAngle = (-CGFloat.pi / 2)
+        
+        let startAngle = 2 * CGFloat.pi + endAngle
+        
+        let circulePath = UIBezierPath(arcCenter: center, radius: 85, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+        
+        shapeLayer.path = circulePath.cgPath
+        shapeLayer.lineWidth = 25
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeEnd = 1
+        shapeLayer.lineCap = CAShapeLayerLineCap.round
+        shapeLayer.strokeColor = UIColor.red.cgColor
+        shapeView.layer.addSublayer(shapeLayer)
+        
+    }
+    
+    func basicAnimation() {
+        let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
+        
+        basicAnimation.toValue = 0
+        basicAnimation.duration = CFTimeInterval(durationTimer)
+        basicAnimation.fillMode = CAMediaTimingFillMode.forwards
+        basicAnimation.isRemovedOnCompletion = true
+        shapeLayer.add(basicAnimation, forKey: "basicAnimation")
     }
 }
 
