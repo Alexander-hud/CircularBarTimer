@@ -27,10 +27,32 @@ class ViewController: UIViewController {
         return imageView
     } ()
     
-    let timeLabel: UILabel = {
+    let timeLabelMinuts: UILabel = {
         let label = UILabel()
-        label.text = "10"
-        label.font = UIFont.boldSystemFont(ofSize: 84)
+        label.text = "25"
+        label.font = UIFont.boldSystemFont(ofSize: 34)
+        label.textColor = .black
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    } ()
+    
+    let timeLabelTire: UILabel = {
+        let label = UILabel()
+        label.text = ":"
+        label.font = UIFont.boldSystemFont(ofSize: 34)
+        label.textColor = .black
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    } ()
+    
+    let timeLabelSecond: UILabel = {
+        let label = UILabel()
+        label.text = "00"
+        label.font = UIFont.boldSystemFont(ofSize: 34)
         label.textColor = .black
         label.numberOfLines = 0
         label.textAlignment = .center
@@ -51,7 +73,10 @@ class ViewController: UIViewController {
     
     let shapeLayer = CAShapeLayer()
     
-    var durationTimer = 10
+    var durationTimerMinuts = 24
+    var durationTimerSecunds = 60
+    
+    lazy var fullTime: [Int] = [durationTimerMinuts, durationTimerSecunds]
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -73,16 +98,24 @@ class ViewController: UIViewController {
         
     }
     
+    
     @objc func timerAction() {
         
-        durationTimer -= 1
-        timeLabel.text = "\(durationTimer)"
+        durationTimerSecunds -= 1
+        timeLabelMinuts.text = "\(durationTimerMinuts)"
+        timeLabelSecond.text = "\(durationTimerSecunds)"
         
-        if durationTimer == 0 {
-            timer.invalidate()
-            durationTimer = 10
-            timer.invalidate()
-        }
+        repeat {
+            if durationTimerSecunds == 0 {
+                timer.invalidate()
+                durationTimerSecunds = 60
+                timer.invalidate()
+                durationTimerMinuts -= 1
+                timeLabelMinuts.text = "\(durationTimerMinuts)"
+                timeLabelSecond.text = "\(durationTimerSecunds)"
+            }
+        } while durationTimerMinuts == 5
+
     }
     
     //MARK: Animation
@@ -111,7 +144,7 @@ class ViewController: UIViewController {
         let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
         
         basicAnimation.toValue = 0
-        basicAnimation.duration = CFTimeInterval(durationTimer)
+        basicAnimation.duration = CFTimeInterval(durationTimerSecunds)
         basicAnimation.fillMode = CAMediaTimingFillMode.forwards
         basicAnimation.isRemovedOnCompletion = true
         shapeLayer.add(basicAnimation, forKey: "basicAnimation")
@@ -135,10 +168,22 @@ extension ViewController {
             shapeView.widthAnchor.constraint(equalToConstant: 500)
         ])
         
-        view.addSubview(timeLabel)
+        view.addSubview(timeLabelMinuts)
         NSLayoutConstraint.activate([
-            timeLabel.centerXAnchor.constraint(equalTo: shapeView.centerXAnchor),
-            timeLabel.centerYAnchor.constraint(equalTo: shapeView.centerYAnchor)
+            timeLabelMinuts.centerXAnchor.constraint(equalTo: shapeView.centerXAnchor, constant: -27),
+            timeLabelMinuts.centerYAnchor.constraint(equalTo: shapeView.centerYAnchor)
+        ])
+        
+        view.addSubview(timeLabelTire)
+        NSLayoutConstraint.activate([
+            timeLabelTire.centerXAnchor.constraint(equalTo: shapeView.centerXAnchor),
+            timeLabelTire.centerYAnchor.constraint(equalTo: shapeView.centerYAnchor, constant: -2)
+        ])
+        
+        view.addSubview(timeLabelSecond)
+        NSLayoutConstraint.activate([
+            timeLabelSecond.centerXAnchor.constraint(equalTo: shapeView.centerXAnchor, constant:  27),
+            timeLabelSecond.centerYAnchor.constraint(equalTo: shapeView.centerYAnchor)
         ])
         
         view.addSubview(startButton)
