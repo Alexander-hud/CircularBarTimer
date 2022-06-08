@@ -113,6 +113,7 @@ class ViewController: UIViewController {
                 durationTimerMinuts -= 1
                 timeLabelMinuts.text = "\(durationTimerMinuts)"
                 timeLabelSecond.text = "\(durationTimerSecunds)"
+            
             }
         } while durationTimerMinuts == 5
 
@@ -144,7 +145,7 @@ class ViewController: UIViewController {
         let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
         
         basicAnimation.toValue = 0
-        basicAnimation.duration = CFTimeInterval(durationTimerSecunds)
+        basicAnimation.duration = CFTimeInterval( durationTimerSecunds)
         basicAnimation.fillMode = CAMediaTimingFillMode.forwards
         basicAnimation.isRemovedOnCompletion = true
         shapeLayer.add(basicAnimation, forKey: "basicAnimation")
