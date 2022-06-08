@@ -96,8 +96,11 @@ class ViewController: UIViewController {
         
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
         
+        
+        
     }
     
+   
     
     @objc func timerAction() {
         
@@ -107,13 +110,11 @@ class ViewController: UIViewController {
         
         repeat {
             if durationTimerSecunds == 0 {
-                timer.invalidate()
-                durationTimerSecunds = 60
-                timer.invalidate()
+                durationTimerSecunds = 59
                 durationTimerMinuts -= 1
                 timeLabelMinuts.text = "\(durationTimerMinuts)"
                 timeLabelSecond.text = "\(durationTimerSecunds)"
-            
+                
             }
         } while durationTimerMinuts == 5
 
@@ -145,7 +146,7 @@ class ViewController: UIViewController {
         let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
         
         basicAnimation.toValue = 0
-        basicAnimation.duration = CFTimeInterval( durationTimerSecunds)
+        basicAnimation.duration = CFTimeInterval(durationTimerSecunds)
         basicAnimation.fillMode = CAMediaTimingFillMode.forwards
         basicAnimation.isRemovedOnCompletion = true
         shapeLayer.add(basicAnimation, forKey: "basicAnimation")
