@@ -27,7 +27,7 @@ class ViewController: UIViewController {
         return imageView
     } ()
     
-    let timeLabelMinuts: UILabel = {
+    var timeLabelMinuts: UILabel = {
         let label = UILabel()
         label.text = "25"
         label.font = UIFont.boldSystemFont(ofSize: 34)
@@ -69,10 +69,29 @@ class ViewController: UIViewController {
         return button
     } ()
     
+    let pauseButton: UIButton = {
+        let button = UIButton()
+        button.layer.cornerRadius = 20
+        button.setTitle("Пауза", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
+        button.backgroundColor = .red
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    } ()
+    
+    let resumeButton: UIButton = {
+        let button = UIButton()
+        button.layer.cornerRadius = 20
+        button.setTitle("Продолжить", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
+        button.backgroundColor = .red
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    } ()
+    
     var timer = Timer()
-    
     let shapeLayer = CAShapeLayer()
-    
+    var isPaused = true
     var durationTimerMinuts = 24
     var durationTimerSecunds = 60
     
@@ -80,7 +99,9 @@ class ViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.animationCircular()
+        
+        self.animationCircular(white: UIColor.red)
+        
     }
     
     override func viewDidLoad() {
@@ -88,22 +109,35 @@ class ViewController: UIViewController {
         view.backgroundColor = .white
         setConstraints()
         startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
+        pauseButton.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
+        resumeButton.addTarget(self, action: #selector(resumeButtonTapped), for: .touchUpInside)
+        
     }
     
     @objc func startButtonTapped() {
-        
         basicAnimation()
-        
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
-        
-        
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(isWorkTime), userInfo: nil, repeats: true)
+    }
+   
+    @objc func pauseButtonTapped() {
+        pauseAnimation()
+        timer.invalidate()
         
     }
-    
-   
-    
-    @objc func timerAction() {
+
+    @objc func resumeButtonTapped() {
         
+        resumeAnimation()
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(isWorkTime), userInfo: nil, repeats: true)
+        if shapeLayer.speed == 0 {
+            resumeButton.isEnabled = true
+        } else {
+            resumeButton.isEnabled = false
+        }
+    }
+    
+    @objc func isWorkTime() {
+        startButton.isEnabled = false
         durationTimerSecunds -= 1
         timeLabelMinuts.text = "\(durationTimerMinuts)"
         timeLabelSecond.text = "\(durationTimerSecunds)"
@@ -114,15 +148,21 @@ class ViewController: UIViewController {
                 durationTimerMinuts -= 1
                 timeLabelMinuts.text = "\(durationTimerMinuts)"
                 timeLabelSecond.text = "\(durationTimerSecunds)"
-                
             }
-        } while durationTimerMinuts == 5
+            
+            else if durationTimerMinuts == 5 {
+                durationTimerMinuts -= 1
+                timeLabelMinuts.text = "\(durationTimerMinuts)"
+                timeLabelSecond.text = "\(durationTimerSecunds)"
+         }
+            
+        } while durationTimerMinuts == 0
 
     }
     
     //MARK: Animation
     
-    func animationCircular() {
+    func animationCircular(white color: UIColor) {
         
         let center = CGPoint(x: shapeView.frame.width / 2, y: shapeView.frame.height / 2)
         
@@ -137,12 +177,31 @@ class ViewController: UIViewController {
         shapeLayer.fillColor = UIColor.clear.cgColor
         shapeLayer.strokeEnd = 1
         shapeLayer.lineCap = CAShapeLayerLineCap.round
-        shapeLayer.strokeColor = UIColor.red.cgColor
+        let color = color
+//        shapeLayer.strokeColor = UIColor.red.cgColor
+        shapeLayer.strokeColor = color.cgColor
         shapeView.layer.addSublayer(shapeLayer)
         
     }
+
+
+    func pauseAnimation() {
+        let pausedTime = shapeLayer.convertTime(CACurrentMediaTime(), from: nil)
+        shapeLayer.speed = 0
+        shapeLayer.timeOffset = pausedTime
+    }
+    
+    func resumeAnimation() {
+        let pausedTime = shapeLayer.timeOffset
+        shapeLayer.speed = 1
+        shapeLayer.timeOffset = 0
+        shapeLayer.beginTime = 0
+        let timeSincePause = shapeLayer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
+        shapeLayer.beginTime = timeSincePause
+        }
     
     func basicAnimation() {
+        
         let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
         
         basicAnimation.toValue = 0
@@ -150,7 +209,12 @@ class ViewController: UIViewController {
         basicAnimation.fillMode = CAMediaTimingFillMode.forwards
         basicAnimation.isRemovedOnCompletion = true
         shapeLayer.add(basicAnimation, forKey: "basicAnimation")
+
     }
+
+        
+
+    
 }
 
 extension ViewController {
@@ -190,10 +254,26 @@ extension ViewController {
         
         view.addSubview(startButton)
         NSLayoutConstraint.activate([
-            startButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
+            startButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -200),
             startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             startButton.heightAnchor.constraint(equalToConstant: 70),
             startButton.widthAnchor.constraint(equalToConstant: 300)
+        ])
+        
+        view.addSubview(pauseButton)
+        NSLayoutConstraint.activate([
+            pauseButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -125),
+            pauseButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            pauseButton.heightAnchor.constraint(equalToConstant: 70),
+            pauseButton.widthAnchor.constraint(equalToConstant: 300)
+        ])
+        
+        view.addSubview(resumeButton)
+        NSLayoutConstraint.activate([
+            resumeButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            resumeButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            resumeButton.heightAnchor.constraint(equalToConstant: 70),
+            resumeButton.widthAnchor.constraint(equalToConstant: 300)
         ])
     }
 }
