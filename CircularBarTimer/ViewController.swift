@@ -130,11 +130,11 @@ class ViewController: UIViewController {
         resumeAnimation()
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(isWorkTime), userInfo: nil, repeats: true)
         
-        if shapeLayer.speed == 0 {
-            resumeButton.isEnabled = true
-        } else {
-            resumeButton.isEnabled = false
-        }
+//        if shapeLayer.speed == 0 {
+//            resumeButton.isEnabled = true
+//        } else {
+//            resumeButton.isEnabled = false
+//        }
     }
     
     @objc func isWorkTime() {
