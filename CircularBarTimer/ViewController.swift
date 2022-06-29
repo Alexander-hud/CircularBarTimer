@@ -11,7 +11,7 @@ class ViewController: UIViewController {
 
     let lessonLabel: UILabel = {
         let label = UILabel()
-        label.text = "My homework swift"
+//        label.text = "My homework swift"
         label.font = UIFont.boldSystemFont(ofSize: 24)
         label.textColor = .black
         label.numberOfLines = 0
@@ -99,18 +99,30 @@ class ViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-        self.animationCircular(white: UIColor.red)
+        greenColor()
         
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        greenColor()
         setConstraints()
         startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
         pauseButton.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
         resumeButton.addTarget(self, action: #selector(resumeButtonTapped), for: .touchUpInside)
+        
+    }
+    
+    @objc func greenColor() {
+        if durationTimerMinuts <= 5 {
+            self.animationCircular(white: UIColor.green)
+            self.lessonLabel.text = "Chile time"
+        } else {
+            self.animationCircular(white: UIColor.red)
+            self.lessonLabel.text = "Work time"
+        }
+        
         
     }
     
@@ -130,15 +142,16 @@ class ViewController: UIViewController {
         resumeAnimation()
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(isWorkTime), userInfo: nil, repeats: true)
         
-//        if shapeLayer.speed == 0 {
-//            resumeButton.isEnabled = true
-//        } else {
-//            resumeButton.isEnabled = false
-//        }
+        if shapeLayer.speed == 0 {
+            self.resumeButton.isEnabled = false
+        } else {
+            self.resumeButton.isEnabled = true
+        }
     }
     
     @objc func isWorkTime() {
         startButton.isEnabled = false
+       
         durationTimerSecunds -= 1
         timeLabelMinuts.text = "\(durationTimerMinuts)"
         timeLabelSecond.text = "\(durationTimerSecunds)"
@@ -150,12 +163,6 @@ class ViewController: UIViewController {
                 timeLabelMinuts.text = "\(durationTimerMinuts)"
                 timeLabelSecond.text = "\(durationTimerSecunds)"
             }
-            
-            else if durationTimerMinuts == 5 {
-                durationTimerMinuts -= 1
-                timeLabelMinuts.text = "\(durationTimerMinuts)"
-                timeLabelSecond.text = "\(durationTimerSecunds)"
-         }
             
         } while durationTimerMinuts == 0
 
@@ -179,7 +186,6 @@ class ViewController: UIViewController {
         shapeLayer.strokeEnd = 1
         shapeLayer.lineCap = CAShapeLayerLineCap.round
         let color = color
-//        shapeLayer.strokeColor = UIColor.red.cgColor
         shapeLayer.strokeColor = color.cgColor
         shapeView.layer.addSublayer(shapeLayer)
         
